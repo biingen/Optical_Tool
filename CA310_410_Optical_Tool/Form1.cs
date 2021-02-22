@@ -46,16 +46,15 @@ namespace CA310_410_Optical_Tool
         public ISheet sheet;
         public FileStream fileStream;
         public IWorkbook workbook = null; //新建IWorkbook對象 
-
-
         [DllImport("user32.dll", EntryPoint = "FindWindow", CharSet = CharSet.Auto)]
         private extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
- 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-
         public const int WM_CLOSE = 0x10;
-
+        public string inifilename_source = "source.ini";
+        public string inifilename_mode = "mode.ini";
+        public string inifilename_CT = "CT.ini";
+        SetupIniIP ini = new SetupIniIP();
 
 
         public Form1()
@@ -73,6 +72,26 @@ namespace CA310_410_Optical_Tool
             //设置数据读取超时为1秒
             serialPort.ReadTimeout = 1000;
             serialPort.Close();
+
+            try
+            {
+                string inipath = Application.StartupPath + @"\\" + inifilename_source;
+                if (File.Exists(Application.StartupPath + "\\" + inifilename_source))
+                {
+                    StreamReader sr = new StreamReader(inipath, Encoding.Default);
+                    while (sr.Peek() > 0)
+                    {
+                        comboBox_sourcelist.Items.Add(sr.ReadLine());
+                    }
+                    sr.Close();
+                    //選中combobox第一個
+                    //comboBox_sourcelist.Text = (string)comboBox_sourcelist.Items[0];
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
         private void f2_Disposed(object sender, EventArgs e)
         {
@@ -278,7 +297,6 @@ namespace CA310_410_Optical_Tool
                     else
                     {
                         System.Environment.Exit(0);
-
                     }
                 }
             }
@@ -356,6 +374,15 @@ namespace CA310_410_Optical_Tool
             button_410.Enabled = false;
             button_Gamma.Enabled = true;
             button_2238gamma.Enabled = true;
+            button_LuminanceTest.Enabled = true;
+            button_LuminanceTest2.Enabled = true;
+            button_ColorTemperature.Enabled = true;
+            button_ContrastRatio.Enabled = true;
+            button_Uniformity.Enabled = true;
+            //button_lightSensor.Enabled = true;
+            button_colorGamut.Enabled = true;
+            button_DimmingRange.Enabled = true;
+            //button_DynamicContrasRatioTest.Enabled = true;
         }
         private void canTmeasure()
         {
@@ -369,6 +396,15 @@ namespace CA310_410_Optical_Tool
             button_410.Enabled = true;
             button_Gamma.Enabled = false;
             button_2238gamma.Enabled = false;
+            button_LuminanceTest.Enabled = false;
+            button_LuminanceTest2.Enabled = false;
+            button_ColorTemperature.Enabled = false;
+            button_ContrastRatio.Enabled = false;
+            button_Uniformity.Enabled = false;
+            //button_lightSensor.Enabled = false;
+            button_colorGamut.Enabled = false;
+            button_DimmingRange.Enabled = false;
+            //button_DynamicContrasRatioTest.Enabled = false;
         }
         private void button_SaveCsv_Click(object sender, EventArgs e)
         {
@@ -898,7 +934,6 @@ namespace CA310_410_Optical_Tool
                 button_Gamma.Text = "Chroma Start";
             }
         }
-  
         private void button_LuminanceTest_Click(object sender, EventArgs e)
         {
             //1.1亮度填入表格
@@ -1290,44 +1325,62 @@ namespace CA310_410_Optical_Tool
                 PostMessage(ptr, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
             }
         }
-
-
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (comboBox_sourcelist.SelectedItem != null)
-            {
-                comboBox_sourcelist.Items.Remove(comboBox_sourcelist.SelectedItem);
-            }
-            
-        }
         private void button_addSource_Click(object sender, EventArgs e)
         {
-            comboBox_sourcelist.Items.Add(comboBox_sourcelist.Text);
+            comboboxadd(comboBox_sourcelist, inifilename_source);
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            comboboxremove(comboBox_sourcelist, inifilename_source);
         }
         private void button_addmode_Click(object sender, EventArgs e)
         {
-            comboBox_modelist.Items.Add(comboBox_modelist.Text);
+            comboboxadd(comboBox_modelist, inifilename_mode);
         }
         private void button_deletemode_Click(object sender, EventArgs e)
         {
-            if (comboBox_modelist.SelectedItem != null)
-            {
-                comboBox_modelist.Items.Remove(comboBox_modelist.SelectedItem);
-            }
-
+            comboboxremove(comboBox_modelist, inifilename_mode);
         }
         private void button_addCT_Click(object sender, EventArgs e)
         {
-            comboBox_CTlist.Items.Add(comboBox_CTlist.Text);
+            comboboxadd(comboBox_CTlist, inifilename_CT);
         }
         private void button_deleteCT_Click(object sender, EventArgs e)
         {
-            if (comboBox_CTlist.SelectedItem != null)
-            {
-                comboBox_CTlist.Items.Remove(comboBox_CTlist.SelectedItem);
-            }
+            comboboxremove(comboBox_CTlist, inifilename_CT);
         }
+        private void comboboxadd(ComboBox combobox, string file)
+        {
+            //新增或者選擇combobox選項後,更新combobox選項順序
+            if (!combobox.Items.Contains(combobox.Text) && combobox.Text != "")
+            {
+                combobox.Items.Add(combobox.Text);
+            }
+            //儲存combobox的選項內容到配置檔案inifilename
+            StreamWriter sw = new StreamWriter(file);
+            for (int i = 0; i< combobox.Items.Count; i++)
+            {
+                sw.WriteLine(combobox.Items[i]);
+            }
+            sw.Close();
+        }
+        private void comboboxremove(ComboBox combobox, string file)
+        {
+            //新增或者選擇combobox選項後,更新combobox選項順序
+            if (combobox.Items.Contains(combobox.Text))
+            {
+                combobox.Items.Remove(combobox.Text);
+                combobox.Text = null;
+            }
+            //儲存combobox的選項內容到配置檔案inifilename
+            StreamWriter sw = new StreamWriter(file);
+            for (int i = 0; i < combobox.Items.Count; i++)
+            {
+                sw.WriteLine(combobox.Items[i]);
+            }
+            sw.Close();
+        }
+
 
         public class NPOIExcel
         {
@@ -1457,7 +1510,27 @@ namespace CA310_410_Optical_Tool
                 }
             }
         }
-
+        public class SetupIniIP
+        {
+            public string path;
+            [DllImport("kernel32", CharSet = CharSet.Unicode)]
+            private static extern long WritePrivateProfileString(string section,
+            string key, string val, string filePath);
+            [DllImport("kernel32", CharSet = CharSet.Unicode)]
+            private static extern int GetPrivateProfileString(string section,
+            string key, string def, StringBuilder retVal,
+            int size, string filePath);
+            public void IniWriteValue(string Section, string Key, string Value, string inipath)
+            {
+                WritePrivateProfileString(Section, Key, Value, Application.StartupPath + "\\" + inipath);
+            }
+            public string IniReadValue(string Section, string Key, string inipath)
+            {
+                StringBuilder temp = new StringBuilder(255);
+                int i = GetPrivateProfileString(Section, Key, "", temp, 255, Application.StartupPath + "\\" + inipath);
+                return temp.ToString();
+            }
+        }
 
     }
 }

@@ -772,9 +772,6 @@
             // 
             this.comboBox_sourcelist.Font = new System.Drawing.Font("新細明體", 9F);
             this.comboBox_sourcelist.FormattingEnabled = true;
-            this.comboBox_sourcelist.Items.AddRange(new object[] {
-            "HDMI1",
-            "HDMI2"});
             this.comboBox_sourcelist.Location = new System.Drawing.Point(7, 42);
             this.comboBox_sourcelist.Name = "comboBox_sourcelist";
             this.comboBox_sourcelist.Size = new System.Drawing.Size(121, 20);
@@ -806,10 +803,6 @@
             // 
             this.comboBox_modelist.Font = new System.Drawing.Font("新細明體", 9F);
             this.comboBox_modelist.FormattingEnabled = true;
-            this.comboBox_modelist.Items.AddRange(new object[] {
-            "default",
-            "mode1",
-            "mode2"});
             this.comboBox_modelist.Location = new System.Drawing.Point(7, 120);
             this.comboBox_modelist.Name = "comboBox_modelist";
             this.comboBox_modelist.Size = new System.Drawing.Size(121, 20);
@@ -841,10 +834,6 @@
             // 
             this.comboBox_CTlist.Font = new System.Drawing.Font("新細明體", 9F);
             this.comboBox_CTlist.FormattingEnabled = true;
-            this.comboBox_CTlist.Items.AddRange(new object[] {
-            "9000k",
-            "sRGB",
-            "default"});
             this.comboBox_CTlist.Location = new System.Drawing.Point(5, 206);
             this.comboBox_CTlist.Name = "comboBox_CTlist";
             this.comboBox_CTlist.Size = new System.Drawing.Size(121, 20);
