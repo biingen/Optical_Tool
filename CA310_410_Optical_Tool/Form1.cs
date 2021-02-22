@@ -42,7 +42,6 @@ namespace CA310_410_Optical_Tool
         SerialPort serialPort = new SerialPort();
         String saveDataFile = null;
         FileStream saveDataFS = null;
-        private BackgroundWorker serialport1BGWorker = new BackgroundWorker();
         public ISheet sheet;
         public FileStream fileStream;
         public IWorkbook workbook = null; //新建IWorkbook對象 
@@ -72,20 +71,25 @@ namespace CA310_410_Optical_Tool
             //设置数据读取超时为1秒
             serialPort.ReadTimeout = 1000;
             serialPort.Close();
-
+            inputsetup(inifilename_source,comboBox_sourcelist);
+            inputsetup(inifilename_mode, comboBox_modelist);
+            inputsetup(inifilename_CT, comboBox_CTlist);
+        }
+        private void inputsetup(string ini,ComboBox combo)
+        {
             try
             {
-                string inipath = Application.StartupPath + @"\\" + inifilename_source;
-                if (File.Exists(Application.StartupPath + "\\" + inifilename_source))
+                string inipath = Application.StartupPath + @"\\" + ini;
+                if (File.Exists(Application.StartupPath + "\\" + ini))
                 {
                     StreamReader sr = new StreamReader(inipath, Encoding.Default);
                     while (sr.Peek() > 0)
                     {
-                        comboBox_sourcelist.Items.Add(sr.ReadLine());
+                        combo.Items.Add(sr.ReadLine());
                     }
                     sr.Close();
                     //選中combobox第一個
-                    //comboBox_sourcelist.Text = (string)comboBox_sourcelist.Items[0];
+                    //combo.Text = (string)comboBox_sourcelist.Items[0];
                 }
             }
             catch (Exception)
@@ -140,7 +144,7 @@ namespace CA310_410_Optical_Tool
                     }
                     number++;
                 }
-                canmeasure();
+                //canmeasure();
             }
             catch (Exception er)
             {
@@ -158,7 +162,15 @@ namespace CA310_410_Optical_Tool
             }
             else
             {
-                string filePath = System.Environment.CurrentDirectory + "\\GammaRefTable.xls";
+                if (System.IO.File.Exists(textBox_excelname.Text + @"_Gamma.xls"))//檔案是否存在
+                {
+                }
+                else
+                {
+                    File.Copy(System.Environment.CurrentDirectory + "\\GammaRefTable", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @"_Gamma.xls");
+                }
+                string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @"_Gamma.xls";
+                //string filePath = System.Environment.CurrentDirectory + "\\GammaRefTable.xls";
                 if (checkBox1_Red.Checked == true)
                 {
                     dataGridView1.Rows.Clear();
@@ -231,12 +243,14 @@ namespace CA310_410_Optical_Tool
                     }
                     gammaexcelNPOI(filePath, dataGridView1, 3);
                 }
-                button_Gamma.Text = "Start";
+                button_Gamma.Text = "Pattern Start";
             }
         measureend:
             canmeasure();
             label_colorstep.ForeColor = Color.Red;
             label_colorstep.Text = "Test Stop";
+            button_Gamma.Text = "Pattern Start";
+
         }
         private void startgamma(object lv)
         {
@@ -246,7 +260,7 @@ namespace CA310_410_Optical_Tool
         }
         private void button_Gamma_Click(object sender, EventArgs e)
         {
-            if (button_Gamma.Text == "Start")
+            if (button_Gamma.Text == "Pattern Start")
             {
                 //按鈕功能變更為取消
                 button_Gamma.Text = "Stop";
@@ -258,7 +272,7 @@ namespace CA310_410_Optical_Tool
                 isMsr = false;
                 //在完全停止前，停用按鈕
                 button_Gamma.Enabled = false;
-                button_Gamma.Text = "Start";
+                button_Gamma.Text = "Pattern Start";
             }
 
             //Thread gammathread =new Thread( new ParameterizedThreadStart(gammacurve));
@@ -269,6 +283,32 @@ namespace CA310_410_Optical_Tool
         private void ButtonMeasure_Click(object sender, EventArgs e)
         {
             measure(1);
+            canmeasure();
+        }
+        private void AutoMeasure_Click(object sender, EventArgs e)
+        {
+            button_AutoMeasure.Enabled = false;
+            isMsr = true;
+            backgroundWorker2.RunWorkerAsync();//移到執行緒執行 
+        }
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            for(;;)
+            {
+                objCa.Measure();
+                backgroundWorker2.ReportProgress(1);
+                Thread.Sleep(1000);
+            }
+        }
+
+        private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            button_AutoMeasure.Enabled = false;
+            LabelLv.Text = objProbe.Lv.ToString("##0.0000");
+            Labelx.Text = objProbe.sx.ToString("0.000000");
+            Labely.Text = objProbe.sy.ToString("0.000000");
+            LabelT.Text = objProbe.T.ToString("####");
+            Labelduv.Text = objProbe.duv.ToString("0.000000");
         }
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
@@ -282,6 +322,7 @@ namespace CA310_410_Optical_Tool
             {
                 ButtonMeasure.Enabled = false;
                 ButtonCalZero.Enabled = false;
+                button_AutoMeasure.Enabled = false;
                 try
                 {
                     objCa.CalZero();
@@ -303,7 +344,7 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("CalZero Finish", "CalZero");
             ButtonMeasure.Enabled = true;
             ButtonCalZero.Enabled = true;
-
+            button_AutoMeasure.Enabled = true;
         }
         private void objCa_ExeCalZero()
         {
@@ -383,6 +424,7 @@ namespace CA310_410_Optical_Tool
             button_colorGamut.Enabled = true;
             button_DimmingRange.Enabled = true;
             //button_DynamicContrasRatioTest.Enabled = true;
+            button_AutoMeasure.Enabled = true;
         }
         private void canTmeasure()
         {
@@ -405,6 +447,7 @@ namespace CA310_410_Optical_Tool
             button_colorGamut.Enabled = false;
             button_DimmingRange.Enabled = false;
             //button_DynamicContrasRatioTest.Enabled = false;
+            button_AutoMeasure.Enabled = false;
         }
         private void button_SaveCsv_Click(object sender, EventArgs e)
         {
@@ -804,7 +847,15 @@ namespace CA310_410_Optical_Tool
             }
             else
             {
-                string filePath = System.Environment.CurrentDirectory + "\\GammaRefTable.xls";
+                if (System.IO.File.Exists(textBox_excelname.Text + @"_Gamma.xls"))//檔案是否存在
+                {
+                }
+                else
+                {
+                    File.Copy(System.Environment.CurrentDirectory + "\\GammaRefTable", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @"_Gamma.xls");
+                }
+                string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @"_Gamma.xls";
+                //string filePath = System.Environment.CurrentDirectory + "\\GammaRefTable.xls";
                 dataGridView1.Rows.Clear();
                 number = 0;
                 if (checkBox1_Red.Checked == true)
@@ -931,15 +982,23 @@ namespace CA310_410_Optical_Tool
                 isMsr = false;
                 //在完全停止前，停用按鈕
                 button_Gamma.Enabled = false;
-                button_Gamma.Text = "Chroma Start";
+                button_Gamma.Text = "Pattern Start";
             }
         }
         private void button_LuminanceTest_Click(object sender, EventArgs e)
         {
             //1.1亮度填入表格
+            canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else    
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             int sheet = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
@@ -967,12 +1026,22 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("Test Finish.","Finish");
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void button_LuminanceTest2_Click(object sender, EventArgs e)
         {
             //1.1亮度填入表格
+            canTmeasure();
             dataGridView1.Rows.Clear();
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 0;
             int excelcolumn = 3;//excel直欄
             int excelrow = 20;//excel橫列
@@ -1012,12 +1081,22 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void button_ColorTemperature_Click(object sender, EventArgs e)
         {
             //1.2 色溫XY填入表格
+            canTmeasure();
             dataGridView1.Rows.Clear();
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 1;
             int excelcolumnX = 5;//excel直欄
             int excelrowX = 23;//excel橫列
@@ -1062,19 +1141,30 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void button_ContrastRatio_Click(object sender, EventArgs e)
         {
+            canTmeasure();
             contrastratio(020, 4, ", White Pattern.");//白
             contrastratio(111, 2, ", Black Pattern.");//黑
             MessageBox.Show("Test Finish.", "Finish");
+            canmeasure();
         }
         private void contrastratio(int ptn,int x,string pattern)
         {
             //ptn為patterngen pattern號, x為打印直排行數,pattern為msg文字
             //1.3
             dataGridView1.Rows.Clear();
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 2;
             int excelCTY = 0;
             int gridviewrow = 0;
@@ -1116,9 +1206,18 @@ namespace CA310_410_Optical_Tool
         private void button_Uniformity_Click(object sender, EventArgs e)
         {
             //1.4
+            canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 3;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
@@ -1141,6 +1240,7 @@ namespace CA310_410_Optical_Tool
             }
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void button_lightSensor_Click(object sender, EventArgs e)
         {
@@ -1149,20 +1249,30 @@ namespace CA310_410_Optical_Tool
         }
         private void button_colorGamut_Click(object sender, EventArgs e)
         {
-            for(int k = 0; k < comboBox_CTlist.Items.Count; k++)
+            canTmeasure();
+            for (int k = 0; k < comboBox_CTlist.Items.Count; k++)
             {
                 comboBox_CTlist.SelectedIndex = k;
                 MessageBox.Show("Change color temperature to "+ comboBox_CTlist.SelectedItem.ToString());
                 colorgamut(k*30);
             }
             MessageBox.Show("Test Finish.", "Finish");
+            canmeasure();
         }
         private void colorgamut(int CT)
         {
             //1.8 color gamut
             dataGridView1.Rows.Clear();
             number = 0;
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 5;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
@@ -1215,9 +1325,18 @@ namespace CA310_410_Optical_Tool
         private void button_DimmingRange_Click(object sender, EventArgs e)
         {
             //1.10
+            canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 6;
             int percent = 0;
             NPOIExcel writer = new NPOIExcel();
@@ -1259,13 +1378,23 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void button_DynamicContrasRatioTest_Click(object sender, EventArgs e)
         {
             //1.11
+            canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+            string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
+            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 7;
             int excelY = 0;
             NPOIExcel writer = new NPOIExcel();
@@ -1301,6 +1430,7 @@ namespace CA310_410_Optical_Tool
             MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
+            canmeasure();
         }
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -1532,5 +1662,7 @@ namespace CA310_410_Optical_Tool
             }
         }
 
+
     }
+
 }

@@ -63,6 +63,7 @@
             this.button_gammapattern = new System.Windows.Forms.Button();
             this.button3_SaveCsv = new System.Windows.Forms.Button();
             this.groupBox1_measure = new System.Windows.Forms.GroupBox();
+            this.button_AutoMeasure = new System.Windows.Forms.Button();
             this.button_connect = new System.Windows.Forms.Button();
             this.button_dsiconnect = new System.Windows.Forms.Button();
             this.button_410 = new System.Windows.Forms.Button();
@@ -96,8 +97,10 @@
             this.comboBox_CTlist = new System.Windows.Forms.ComboBox();
             this.button_deleteCT = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.textBox_excelname = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.button_DynamicContrasRatioTest = new System.Windows.Forms.Button();
@@ -105,6 +108,7 @@
             this.button_colorGamut = new System.Windows.Forms.Button();
             this.button_lightSensor = new System.Windows.Forms.Button();
             this.button_Uniformity = new System.Windows.Forms.Button();
+            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1_gamma.SuspendLayout();
             this.groupBox1_measure.SuspendLayout();
@@ -117,8 +121,8 @@
             // 
             // ButtonCalZero
             // 
-            this.ButtonCalZero.Font = new System.Drawing.Font("新細明體", 9F);
-            this.ButtonCalZero.Location = new System.Drawing.Point(124, 88);
+            this.ButtonCalZero.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.ButtonCalZero.Location = new System.Drawing.Point(127, 15);
             this.ButtonCalZero.Name = "ButtonCalZero";
             this.ButtonCalZero.Size = new System.Drawing.Size(75, 23);
             this.ButtonCalZero.TabIndex = 38;
@@ -128,8 +132,8 @@
             // 
             // ButtonMeasure
             // 
-            this.ButtonMeasure.Font = new System.Drawing.Font("新細明體", 9F);
-            this.ButtonMeasure.Location = new System.Drawing.Point(124, 19);
+            this.ButtonMeasure.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.ButtonMeasure.Location = new System.Drawing.Point(127, 42);
             this.ButtonMeasure.Name = "ButtonMeasure";
             this.ButtonMeasure.Size = new System.Drawing.Size(75, 23);
             this.ButtonMeasure.TabIndex = 37;
@@ -139,8 +143,8 @@
             // 
             // ButtonCancel
             // 
-            this.ButtonCancel.Font = new System.Drawing.Font("新細明體", 9F);
-            this.ButtonCancel.Location = new System.Drawing.Point(124, 53);
+            this.ButtonCancel.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.ButtonCancel.Location = new System.Drawing.Point(127, 94);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
             this.ButtonCancel.TabIndex = 36;
@@ -151,100 +155,102 @@
             // Labelduv
             // 
             this.Labelduv.AutoSize = true;
-            this.Labelduv.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Labelduv.Location = new System.Drawing.Point(43, 101);
+            this.Labelduv.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Labelduv.Location = new System.Drawing.Point(795, 31);
             this.Labelduv.Name = "Labelduv";
-            this.Labelduv.Size = new System.Drawing.Size(38, 12);
+            this.Labelduv.Size = new System.Drawing.Size(52, 16);
             this.Labelduv.TabIndex = 35;
             this.Labelduv.Text = "0.0000";
+            this.Labelduv.Visible = false;
             // 
             // LabelT
             // 
             this.LabelT.AutoSize = true;
-            this.LabelT.Font = new System.Drawing.Font("新細明體", 9F);
-            this.LabelT.Location = new System.Drawing.Point(43, 81);
+            this.LabelT.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.LabelT.Location = new System.Drawing.Point(35, 68);
             this.LabelT.Name = "LabelT";
-            this.LabelT.Size = new System.Drawing.Size(38, 12);
+            this.LabelT.Size = new System.Drawing.Size(71, 24);
             this.LabelT.TabIndex = 34;
             this.LabelT.Text = "0.0000";
             // 
             // Labely
             // 
             this.Labely.AutoSize = true;
-            this.Labely.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Labely.Location = new System.Drawing.Point(43, 39);
+            this.Labely.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Labely.Location = new System.Drawing.Point(35, 42);
             this.Labely.Name = "Labely";
-            this.Labely.Size = new System.Drawing.Size(38, 12);
+            this.Labely.Size = new System.Drawing.Size(71, 24);
             this.Labely.TabIndex = 33;
             this.Labely.Text = "0.0000";
             // 
             // Labelx
             // 
             this.Labelx.AutoSize = true;
-            this.Labelx.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Labelx.Location = new System.Drawing.Point(43, 18);
+            this.Labelx.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Labelx.Location = new System.Drawing.Point(35, 18);
             this.Labelx.Name = "Labelx";
-            this.Labelx.Size = new System.Drawing.Size(38, 12);
+            this.Labelx.Size = new System.Drawing.Size(71, 24);
             this.Labelx.TabIndex = 32;
             this.Labelx.Text = "0.0000";
             // 
             // LabelLv
             // 
             this.LabelLv.AutoSize = true;
-            this.LabelLv.Font = new System.Drawing.Font("新細明體", 9F);
-            this.LabelLv.Location = new System.Drawing.Point(43, 60);
+            this.LabelLv.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.LabelLv.Location = new System.Drawing.Point(35, 93);
             this.LabelLv.Name = "LabelLv";
-            this.LabelLv.Size = new System.Drawing.Size(38, 12);
+            this.LabelLv.Size = new System.Drawing.Size(71, 24);
             this.LabelLv.TabIndex = 31;
             this.LabelLv.Text = "0.0000";
             // 
             // Label5
             // 
             this.Label5.AutoSize = true;
-            this.Label5.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Label5.Location = new System.Drawing.Point(8, 101);
+            this.Label5.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Label5.Location = new System.Drawing.Point(760, 31);
             this.Label5.Name = "Label5";
-            this.Label5.Size = new System.Drawing.Size(26, 12);
+            this.Label5.Size = new System.Drawing.Size(36, 16);
             this.Label5.TabIndex = 30;
             this.Label5.Text = "duv:";
+            this.Label5.Visible = false;
             // 
             // Label4
             // 
             this.Label4.AutoSize = true;
-            this.Label4.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Label4.Location = new System.Drawing.Point(8, 81);
+            this.Label4.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Label4.Location = new System.Drawing.Point(0, 68);
             this.Label4.Name = "Label4";
-            this.Label4.Size = new System.Drawing.Size(15, 12);
+            this.Label4.Size = new System.Drawing.Size(30, 24);
             this.Label4.TabIndex = 29;
             this.Label4.Text = "T:";
             // 
             // Label3
             // 
             this.Label3.AutoSize = true;
-            this.Label3.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Label3.Location = new System.Drawing.Point(8, 39);
+            this.Label3.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Label3.Location = new System.Drawing.Point(0, 42);
             this.Label3.Name = "Label3";
-            this.Label3.Size = new System.Drawing.Size(14, 12);
+            this.Label3.Size = new System.Drawing.Size(27, 24);
             this.Label3.TabIndex = 28;
             this.Label3.Text = "y:";
             // 
             // Label2
             // 
             this.Label2.AutoSize = true;
-            this.Label2.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Label2.Location = new System.Drawing.Point(8, 18);
+            this.Label2.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Label2.Location = new System.Drawing.Point(0, 18);
             this.Label2.Name = "Label2";
-            this.Label2.Size = new System.Drawing.Size(14, 12);
+            this.Label2.Size = new System.Drawing.Size(27, 24);
             this.Label2.TabIndex = 27;
             this.Label2.Text = "x:";
             // 
             // Label1
             // 
             this.Label1.AutoSize = true;
-            this.Label1.Font = new System.Drawing.Font("新細明體", 9F);
-            this.Label1.Location = new System.Drawing.Point(8, 60);
+            this.Label1.Font = new System.Drawing.Font("PMingLiU", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Label1.Location = new System.Drawing.Point(0, 93);
             this.Label1.Name = "Label1";
-            this.Label1.Size = new System.Drawing.Size(21, 12);
+            this.Label1.Size = new System.Drawing.Size(41, 24);
             this.Label1.TabIndex = 26;
             this.Label1.Text = "Lv:";
             // 
@@ -326,7 +332,7 @@
             // checkBox1_Red
             // 
             this.checkBox1_Red.AutoSize = true;
-            this.checkBox1_Red.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.checkBox1_Red.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.checkBox1_Red.Location = new System.Drawing.Point(11, 17);
             this.checkBox1_Red.Name = "checkBox1_Red";
             this.checkBox1_Red.Size = new System.Drawing.Size(43, 16);
@@ -337,7 +343,7 @@
             // checkBox2_Green
             // 
             this.checkBox2_Green.AutoSize = true;
-            this.checkBox2_Green.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.checkBox2_Green.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.checkBox2_Green.Location = new System.Drawing.Point(11, 38);
             this.checkBox2_Green.Name = "checkBox2_Green";
             this.checkBox2_Green.Size = new System.Drawing.Size(52, 16);
@@ -348,7 +354,7 @@
             // checkBox3_Blue
             // 
             this.checkBox3_Blue.AutoSize = true;
-            this.checkBox3_Blue.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.checkBox3_Blue.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.checkBox3_Blue.Location = new System.Drawing.Point(11, 60);
             this.checkBox3_Blue.Name = "checkBox3_Blue";
             this.checkBox3_Blue.Size = new System.Drawing.Size(46, 16);
@@ -359,7 +365,7 @@
             // checkBox4_White
             // 
             this.checkBox4_White.AutoSize = true;
-            this.checkBox4_White.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.checkBox4_White.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.checkBox4_White.Location = new System.Drawing.Point(11, 82);
             this.checkBox4_White.Name = "checkBox4_White";
             this.checkBox4_White.Size = new System.Drawing.Size(52, 16);
@@ -379,7 +385,7 @@
             this.groupBox1_gamma.Controls.Add(this.checkBox3_Blue);
             this.groupBox1_gamma.Controls.Add(this.checkBox1_Red);
             this.groupBox1_gamma.Controls.Add(this.checkBox2_Green);
-            this.groupBox1_gamma.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.groupBox1_gamma.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.groupBox1_gamma.Location = new System.Drawing.Point(238, 83);
             this.groupBox1_gamma.Name = "groupBox1_gamma";
             this.groupBox1_gamma.Size = new System.Drawing.Size(201, 167);
@@ -390,7 +396,7 @@
             // button_2238gamma
             // 
             this.button_2238gamma.Enabled = false;
-            this.button_2238gamma.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_2238gamma.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_2238gamma.Location = new System.Drawing.Point(115, 75);
             this.button_2238gamma.Name = "button_2238gamma";
             this.button_2238gamma.Size = new System.Drawing.Size(75, 23);
@@ -402,7 +408,7 @@
             // label_colorstep
             // 
             this.label_colorstep.AutoSize = true;
-            this.label_colorstep.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label_colorstep.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.label_colorstep.Location = new System.Drawing.Point(11, 138);
             this.label_colorstep.Name = "label_colorstep";
             this.label_colorstep.Size = new System.Drawing.Size(66, 16);
@@ -412,7 +418,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label6.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.label6.Location = new System.Drawing.Point(12, 110);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(80, 12);
@@ -421,7 +427,7 @@
             // 
             // textBox_gammadelay
             // 
-            this.textBox_gammadelay.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.textBox_gammadelay.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.textBox_gammadelay.Location = new System.Drawing.Point(115, 107);
             this.textBox_gammadelay.Name = "textBox_gammadelay";
             this.textBox_gammadelay.Size = new System.Drawing.Size(74, 22);
@@ -430,7 +436,7 @@
             // 
             // button_Gamma
             // 
-            this.button_Gamma.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.button_Gamma.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.button_Gamma.Location = new System.Drawing.Point(115, 46);
             this.button_Gamma.Name = "button_Gamma";
             this.button_Gamma.Size = new System.Drawing.Size(75, 23);
@@ -441,7 +447,7 @@
             // 
             // button_gammapattern
             // 
-            this.button_gammapattern.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.button_gammapattern.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.button_gammapattern.Location = new System.Drawing.Point(115, 17);
             this.button_gammapattern.Name = "button_gammapattern";
             this.button_gammapattern.Size = new System.Drawing.Size(75, 23);
@@ -462,26 +468,36 @@
             // 
             // groupBox1_measure
             // 
+            this.groupBox1_measure.Controls.Add(this.button_AutoMeasure);
             this.groupBox1_measure.Controls.Add(this.LabelLv);
             this.groupBox1_measure.Controls.Add(this.Label1);
             this.groupBox1_measure.Controls.Add(this.Label2);
             this.groupBox1_measure.Controls.Add(this.Label3);
             this.groupBox1_measure.Controls.Add(this.Label4);
-            this.groupBox1_measure.Controls.Add(this.Label5);
             this.groupBox1_measure.Controls.Add(this.Labelx);
             this.groupBox1_measure.Controls.Add(this.Labely);
             this.groupBox1_measure.Controls.Add(this.LabelT);
             this.groupBox1_measure.Controls.Add(this.ButtonCancel);
-            this.groupBox1_measure.Controls.Add(this.Labelduv);
             this.groupBox1_measure.Controls.Add(this.ButtonMeasure);
             this.groupBox1_measure.Controls.Add(this.ButtonCalZero);
-            this.groupBox1_measure.Font = new System.Drawing.Font("新細明體", 12F);
+            this.groupBox1_measure.Font = new System.Drawing.Font("PMingLiU", 12F);
             this.groupBox1_measure.Location = new System.Drawing.Point(14, 127);
             this.groupBox1_measure.Name = "groupBox1_measure";
             this.groupBox1_measure.Size = new System.Drawing.Size(206, 123);
             this.groupBox1_measure.TabIndex = 61;
             this.groupBox1_measure.TabStop = false;
             this.groupBox1_measure.Text = "Measure";
+            // 
+            // button_AutoMeasure
+            // 
+            this.button_AutoMeasure.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_AutoMeasure.Location = new System.Drawing.Point(127, 68);
+            this.button_AutoMeasure.Name = "button_AutoMeasure";
+            this.button_AutoMeasure.Size = new System.Drawing.Size(75, 23);
+            this.button_AutoMeasure.TabIndex = 39;
+            this.button_AutoMeasure.Text = "AutoMeasure";
+            this.button_AutoMeasure.UseVisualStyleBackColor = true;
+            this.button_AutoMeasure.Click += new System.EventHandler(this.AutoMeasure_Click);
             // 
             // button_connect
             // 
@@ -527,7 +543,7 @@
             // label_mode
             // 
             this.label_mode.AutoSize = true;
-            this.label_mode.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label_mode.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.label_mode.Location = new System.Drawing.Point(46, 38);
             this.label_mode.Name = "label_mode";
             this.label_mode.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -542,7 +558,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label_connect.AutoSize = true;
-            this.label_connect.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label_connect.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.label_connect.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label_connect.Location = new System.Drawing.Point(61, 40);
             this.label_connect.Name = "label_connect";
@@ -576,7 +592,7 @@
             // 
             // comboBox_com
             // 
-            this.comboBox_com.Font = new System.Drawing.Font("新細明體", 9F);
+            this.comboBox_com.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.comboBox_com.FormattingEnabled = true;
             this.comboBox_com.Location = new System.Drawing.Point(7, 20);
             this.comboBox_com.Name = "comboBox_com";
@@ -585,7 +601,7 @@
             // 
             // button_SearchCOM
             // 
-            this.button_SearchCOM.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_SearchCOM.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_SearchCOM.Location = new System.Drawing.Point(135, 19);
             this.button_SearchCOM.Name = "button_SearchCOM";
             this.button_SearchCOM.Size = new System.Drawing.Size(75, 23);
@@ -596,7 +612,7 @@
             // 
             // button_buttonOpenCloseCom
             // 
-            this.button_buttonOpenCloseCom.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_buttonOpenCloseCom.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_buttonOpenCloseCom.Location = new System.Drawing.Point(6, 46);
             this.button_buttonOpenCloseCom.Name = "button_buttonOpenCloseCom";
             this.button_buttonOpenCloseCom.Size = new System.Drawing.Size(97, 23);
@@ -608,7 +624,7 @@
             // button_whitepattern
             // 
             this.button_whitepattern.Enabled = false;
-            this.button_whitepattern.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_whitepattern.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_whitepattern.Location = new System.Drawing.Point(6, 78);
             this.button_whitepattern.Name = "button_whitepattern";
             this.button_whitepattern.Size = new System.Drawing.Size(75, 23);
@@ -620,7 +636,7 @@
             // button_redpattern
             // 
             this.button_redpattern.Enabled = false;
-            this.button_redpattern.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_redpattern.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_redpattern.Location = new System.Drawing.Point(6, 113);
             this.button_redpattern.Name = "button_redpattern";
             this.button_redpattern.Size = new System.Drawing.Size(75, 23);
@@ -632,7 +648,7 @@
             // button_greenpattern
             // 
             this.button_greenpattern.Enabled = false;
-            this.button_greenpattern.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_greenpattern.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_greenpattern.Location = new System.Drawing.Point(87, 113);
             this.button_greenpattern.Name = "button_greenpattern";
             this.button_greenpattern.Size = new System.Drawing.Size(75, 23);
@@ -653,7 +669,7 @@
             this.groupBox3.Controls.Add(this.button_redpattern);
             this.groupBox3.Controls.Add(this.button_whitepattern);
             this.groupBox3.Controls.Add(this.button_SearchCOM);
-            this.groupBox3.Font = new System.Drawing.Font("新細明體", 12F);
+            this.groupBox3.Font = new System.Drawing.Font("PMingLiU", 12F);
             this.groupBox3.Location = new System.Drawing.Point(452, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(257, 151);
@@ -664,7 +680,7 @@
             // label_COMconnect
             // 
             this.label_COMconnect.AutoSize = true;
-            this.label_COMconnect.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label_COMconnect.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.label_COMconnect.Location = new System.Drawing.Point(112, 50);
             this.label_COMconnect.Name = "label_COMconnect";
             this.label_COMconnect.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -676,7 +692,7 @@
             // button_9point
             // 
             this.button_9point.Enabled = false;
-            this.button_9point.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_9point.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_9point.Location = new System.Drawing.Point(168, 78);
             this.button_9point.Name = "button_9point";
             this.button_9point.Size = new System.Drawing.Size(75, 23);
@@ -688,7 +704,7 @@
             // button_blackpattern
             // 
             this.button_blackpattern.Enabled = false;
-            this.button_blackpattern.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_blackpattern.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_blackpattern.Location = new System.Drawing.Point(87, 78);
             this.button_blackpattern.Name = "button_blackpattern";
             this.button_blackpattern.Size = new System.Drawing.Size(75, 23);
@@ -700,7 +716,7 @@
             // button_bluepattern
             // 
             this.button_bluepattern.Enabled = false;
-            this.button_bluepattern.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_bluepattern.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_bluepattern.Location = new System.Drawing.Point(168, 113);
             this.button_bluepattern.Name = "button_bluepattern";
             this.button_bluepattern.Size = new System.Drawing.Size(75, 23);
@@ -711,7 +727,7 @@
             // 
             // button_LuminanceTest
             // 
-            this.button_LuminanceTest.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_LuminanceTest.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_LuminanceTest.Location = new System.Drawing.Point(14, 21);
             this.button_LuminanceTest.Name = "button_LuminanceTest";
             this.button_LuminanceTest.Size = new System.Drawing.Size(89, 23);
@@ -723,7 +739,7 @@
             // 
             // button_LuminanceTest2
             // 
-            this.button_LuminanceTest2.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_LuminanceTest2.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_LuminanceTest2.Location = new System.Drawing.Point(14, 53);
             this.button_LuminanceTest2.Name = "button_LuminanceTest2";
             this.button_LuminanceTest2.Size = new System.Drawing.Size(89, 23);
@@ -735,7 +751,7 @@
             // 
             // button_ColorTemperature
             // 
-            this.button_ColorTemperature.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_ColorTemperature.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_ColorTemperature.Location = new System.Drawing.Point(14, 84);
             this.button_ColorTemperature.Name = "button_ColorTemperature";
             this.button_ColorTemperature.Size = new System.Drawing.Size(89, 23);
@@ -747,7 +763,7 @@
             // 
             // button_ContrastRatio
             // 
-            this.button_ContrastRatio.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_ContrastRatio.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_ContrastRatio.Location = new System.Drawing.Point(14, 115);
             this.button_ContrastRatio.Name = "button_ContrastRatio";
             this.button_ContrastRatio.Size = new System.Drawing.Size(89, 23);
@@ -759,8 +775,8 @@
             // 
             // button_deleteSource
             // 
-            this.button_deleteSource.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_deleteSource.Location = new System.Drawing.Point(69, 68);
+            this.button_deleteSource.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_deleteSource.Location = new System.Drawing.Point(69, 116);
             this.button_deleteSource.Name = "button_deleteSource";
             this.button_deleteSource.Size = new System.Drawing.Size(59, 23);
             this.button_deleteSource.TabIndex = 94;
@@ -770,17 +786,17 @@
             // 
             // comboBox_sourcelist
             // 
-            this.comboBox_sourcelist.Font = new System.Drawing.Font("新細明體", 9F);
+            this.comboBox_sourcelist.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.comboBox_sourcelist.FormattingEnabled = true;
-            this.comboBox_sourcelist.Location = new System.Drawing.Point(7, 42);
+            this.comboBox_sourcelist.Location = new System.Drawing.Point(7, 90);
             this.comboBox_sourcelist.Name = "comboBox_sourcelist";
             this.comboBox_sourcelist.Size = new System.Drawing.Size(121, 20);
             this.comboBox_sourcelist.TabIndex = 97;
             // 
             // button_addSource
             // 
-            this.button_addSource.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_addSource.Location = new System.Drawing.Point(8, 68);
+            this.button_addSource.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_addSource.Location = new System.Drawing.Point(8, 116);
             this.button_addSource.Name = "button_addSource";
             this.button_addSource.Size = new System.Drawing.Size(59, 23);
             this.button_addSource.TabIndex = 98;
@@ -790,8 +806,8 @@
             // 
             // button_addmode
             // 
-            this.button_addmode.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_addmode.Location = new System.Drawing.Point(8, 146);
+            this.button_addmode.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_addmode.Location = new System.Drawing.Point(8, 188);
             this.button_addmode.Name = "button_addmode";
             this.button_addmode.Size = new System.Drawing.Size(59, 23);
             this.button_addmode.TabIndex = 101;
@@ -801,17 +817,17 @@
             // 
             // comboBox_modelist
             // 
-            this.comboBox_modelist.Font = new System.Drawing.Font("新細明體", 9F);
+            this.comboBox_modelist.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.comboBox_modelist.FormattingEnabled = true;
-            this.comboBox_modelist.Location = new System.Drawing.Point(7, 120);
+            this.comboBox_modelist.Location = new System.Drawing.Point(7, 162);
             this.comboBox_modelist.Name = "comboBox_modelist";
             this.comboBox_modelist.Size = new System.Drawing.Size(121, 20);
             this.comboBox_modelist.TabIndex = 100;
             // 
             // button_deletemode
             // 
-            this.button_deletemode.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_deletemode.Location = new System.Drawing.Point(69, 146);
+            this.button_deletemode.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_deletemode.Location = new System.Drawing.Point(69, 188);
             this.button_deletemode.Name = "button_deletemode";
             this.button_deletemode.Size = new System.Drawing.Size(59, 23);
             this.button_deletemode.TabIndex = 99;
@@ -821,8 +837,8 @@
             // 
             // button_addCT
             // 
-            this.button_addCT.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_addCT.Location = new System.Drawing.Point(6, 232);
+            this.button_addCT.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_addCT.Location = new System.Drawing.Point(6, 262);
             this.button_addCT.Name = "button_addCT";
             this.button_addCT.Size = new System.Drawing.Size(59, 23);
             this.button_addCT.TabIndex = 104;
@@ -832,17 +848,17 @@
             // 
             // comboBox_CTlist
             // 
-            this.comboBox_CTlist.Font = new System.Drawing.Font("新細明體", 9F);
+            this.comboBox_CTlist.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.comboBox_CTlist.FormattingEnabled = true;
-            this.comboBox_CTlist.Location = new System.Drawing.Point(5, 206);
+            this.comboBox_CTlist.Location = new System.Drawing.Point(5, 236);
             this.comboBox_CTlist.Name = "comboBox_CTlist";
             this.comboBox_CTlist.Size = new System.Drawing.Size(121, 20);
             this.comboBox_CTlist.TabIndex = 103;
             // 
             // button_deleteCT
             // 
-            this.button_deleteCT.Font = new System.Drawing.Font("新細明體", 9F);
-            this.button_deleteCT.Location = new System.Drawing.Point(67, 232);
+            this.button_deleteCT.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.button_deleteCT.Location = new System.Drawing.Point(67, 262);
             this.button_deleteCT.Name = "button_deleteCT";
             this.button_deleteCT.Size = new System.Drawing.Size(59, 23);
             this.button_deleteCT.TabIndex = 102;
@@ -852,8 +868,10 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.textBox_excelname);
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label8);
+            this.groupBox4.Controls.Add(this.label10);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.comboBox_sourcelist);
             this.groupBox4.Controls.Add(this.button_addCT);
@@ -864,7 +882,7 @@
             this.groupBox4.Controls.Add(this.button_deletemode);
             this.groupBox4.Controls.Add(this.button_addmode);
             this.groupBox4.Controls.Add(this.comboBox_modelist);
-            this.groupBox4.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.groupBox4.Font = new System.Drawing.Font("PMingLiU", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.groupBox4.Location = new System.Drawing.Point(452, 166);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(134, 296);
@@ -872,11 +890,20 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Setting";
             // 
+            // textBox_excelname
+            // 
+            this.textBox_excelname.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.textBox_excelname.Location = new System.Drawing.Point(7, 47);
+            this.textBox_excelname.Name = "textBox_excelname";
+            this.textBox_excelname.Size = new System.Drawing.Size(120, 22);
+            this.textBox_excelname.TabIndex = 110;
+            this.textBox_excelname.Text = "Test_Report_optical";
+            // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("新細明體", 9F);
-            this.label9.Location = new System.Drawing.Point(6, 189);
+            this.label9.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.label9.Location = new System.Drawing.Point(6, 219);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(94, 12);
             this.label9.TabIndex = 108;
@@ -885,18 +912,28 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("新細明體", 9F);
-            this.label8.Location = new System.Drawing.Point(6, 105);
+            this.label8.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.label8.Location = new System.Drawing.Point(6, 147);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(67, 12);
             this.label8.TabIndex = 107;
             this.label8.Text = "Picture Mode";
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.label10.Location = new System.Drawing.Point(4, 29);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(90, 12);
+            this.label10.TabIndex = 109;
+            this.label10.Text = "EXCEL File name";
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("新細明體", 9F);
-            this.label7.Location = new System.Drawing.Point(6, 27);
+            this.label7.Font = new System.Drawing.Font("PMingLiU", 9F);
+            this.label7.Location = new System.Drawing.Point(6, 75);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 12);
             this.label7.TabIndex = 106;
@@ -913,7 +950,7 @@
             this.groupBox5.Controls.Add(this.button_LuminanceTest2);
             this.groupBox5.Controls.Add(this.button_ContrastRatio);
             this.groupBox5.Controls.Add(this.button_ColorTemperature);
-            this.groupBox5.Font = new System.Drawing.Font("新細明體", 12F);
+            this.groupBox5.Font = new System.Drawing.Font("PMingLiU", 12F);
             this.groupBox5.Location = new System.Drawing.Point(592, 166);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(117, 296);
@@ -924,7 +961,7 @@
             // button_DynamicContrasRatioTest
             // 
             this.button_DynamicContrasRatioTest.Enabled = false;
-            this.button_DynamicContrasRatioTest.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_DynamicContrasRatioTest.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_DynamicContrasRatioTest.Location = new System.Drawing.Point(14, 266);
             this.button_DynamicContrasRatioTest.Name = "button_DynamicContrasRatioTest";
             this.button_DynamicContrasRatioTest.Size = new System.Drawing.Size(89, 23);
@@ -936,7 +973,7 @@
             // 
             // button_DimmingRange
             // 
-            this.button_DimmingRange.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_DimmingRange.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_DimmingRange.Location = new System.Drawing.Point(14, 237);
             this.button_DimmingRange.Name = "button_DimmingRange";
             this.button_DimmingRange.Size = new System.Drawing.Size(89, 23);
@@ -948,7 +985,7 @@
             // 
             // button_colorGamut
             // 
-            this.button_colorGamut.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_colorGamut.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_colorGamut.Location = new System.Drawing.Point(14, 208);
             this.button_colorGamut.Name = "button_colorGamut";
             this.button_colorGamut.Size = new System.Drawing.Size(89, 23);
@@ -961,7 +998,7 @@
             // button_lightSensor
             // 
             this.button_lightSensor.Enabled = false;
-            this.button_lightSensor.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_lightSensor.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_lightSensor.Location = new System.Drawing.Point(14, 177);
             this.button_lightSensor.Name = "button_lightSensor";
             this.button_lightSensor.Size = new System.Drawing.Size(89, 23);
@@ -973,7 +1010,7 @@
             // 
             // button_Uniformity
             // 
-            this.button_Uniformity.Font = new System.Drawing.Font("新細明體", 9F);
+            this.button_Uniformity.Font = new System.Drawing.Font("PMingLiU", 9F);
             this.button_Uniformity.Location = new System.Drawing.Point(14, 146);
             this.button_Uniformity.Name = "button_Uniformity";
             this.button_Uniformity.Size = new System.Drawing.Size(89, 23);
@@ -983,22 +1020,31 @@
             this.button_Uniformity.UseVisualStyleBackColor = true;
             this.button_Uniformity.Click += new System.EventHandler(this.button_Uniformity_Click);
             // 
+            // backgroundWorker2
+            // 
+            this.backgroundWorker2.WorkerReportsProgress = true;
+            this.backgroundWorker2.WorkerSupportsCancellation = true;
+            this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
+            this.backgroundWorker2.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker2_ProgressChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(715, 468);
+            this.ClientSize = new System.Drawing.Size(713, 468);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox1_measure);
+            this.Controls.Add(this.Label5);
             this.Controls.Add(this.button3_SaveCsv);
             this.Controls.Add(this.groupBox1_gamma);
             this.Controls.Add(this.button_clear);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.caControlWrapper1);
+            this.Controls.Add(this.Labelduv);
             this.Name = "Form1";
             this.Text = "CA310/410 gamma tool";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -1018,6 +1064,7 @@
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -1100,6 +1147,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Lv;
         private System.Windows.Forms.DataGridViewTextBoxColumn T;
         private System.Windows.Forms.DataGridViewTextBoxColumn duv;
+        internal System.Windows.Forms.Button button_AutoMeasure;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.TextBox textBox_excelname;
+        private System.Windows.Forms.Label label10;
     }
 }
 
