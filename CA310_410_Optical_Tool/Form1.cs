@@ -39,12 +39,14 @@ namespace CA310_410_Optical_Tool
         long vbObjectError = -2147221504;
         Form2 f2 = null;
         int number = 0;
-        SerialPort serialPort = new SerialPort();
+        SerialPort serialPort2238 = new SerialPort();
+        SerialPort serialPortPID = new SerialPort();
         String saveDataFile = null;
         FileStream saveDataFS = null;
         public ISheet sheet;
         public FileStream fileStream;
         public IWorkbook workbook = null; //新建IWorkbook對象 
+        public HSSFWorkbook wookbook;
         [DllImport("user32.dll", EntryPoint = "FindWindow", CharSet = CharSet.Auto)]
         private extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
          [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -54,6 +56,8 @@ namespace CA310_410_Optical_Tool
         public string inifilename_mode = "mode.ini";
         public string inifilename_CT = "CT.ini";
         SetupIniIP ini = new SetupIniIP();
+        string RS232filepath = System.Environment.CurrentDirectory + @"\" + @"309_Optical.xls";
+        
 
 
         public Form1()
@@ -66,11 +70,11 @@ namespace CA310_410_Optical_Tool
             button_connect.Enabled = false;
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(dataReceived);
             //准备就绪              
-            serialPort.DtrEnable = true;
-            serialPort.RtsEnable = true;
+            serialPort2238.DtrEnable = true;
+            serialPort2238.RtsEnable = true;
             //设置数据读取超时为1秒
-            serialPort.ReadTimeout = 1000;
-            serialPort.Close();
+            serialPort2238.ReadTimeout = 1000;
+            serialPort2238.Close();
             inputsetup(inifilename_source,comboBox_sourcelist);
             inputsetup(inifilename_mode, comboBox_modelist);
             inputsetup(inifilename_CT, comboBox_CTlist);
@@ -134,7 +138,8 @@ namespace CA310_410_Optical_Tool
                     Labely.Text = objProbe.sy.ToString("0.000000");
                     LabelT.Text = objProbe.T.ToString("####");
                     Labelduv.Text = objProbe.duv.ToString("0.000000");
-                    dataGridView1.Rows.Add(number, Labelx.Text, Labely.Text, LabelLv.Text, LabelT.Text, Labelduv.Text);
+                    dataGridView1.Rows.Add(number, Labelx.Text, Labely.Text, LabelLv.Text, LabelT.Text, Labelduv.Text,
+                        comboBox_sourcelist.Text, comboBox_modelist.Text, comboBox_CTlist.Text);
                     Application.DoEvents();
                     //objxyControl.SetXYGraphData();
                     Thread.Sleep(100);
@@ -289,18 +294,25 @@ namespace CA310_410_Optical_Tool
         {
             button_AutoMeasure.Enabled = false;
             isMsr = true;
+            ButtonCancel.Enabled = true;
             backgroundWorker2.RunWorkerAsync();//移到執行緒執行 
         }
         private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
             for(;;)
             {
+                if (backgroundWorker2.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    break;
+                }
                 objCa.Measure();
                 backgroundWorker2.ReportProgress(1);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
-        }
 
+
+        }
         private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             button_AutoMeasure.Enabled = false;
@@ -310,9 +322,15 @@ namespace CA310_410_Optical_Tool
             LabelT.Text = objProbe.T.ToString("####");
             Labelduv.Text = objProbe.duv.ToString("0.000000");
         }
+        private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //backgroundWorker2.RunWorkerAsync();//移到執行緒執行 
+        }
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
             isMsr = false;
+            backgroundWorker2.CancelAsync();
+            canmeasure();
         }
         private void ButtonCalZero_Click(object sender, EventArgs e)
         {
@@ -405,7 +423,7 @@ namespace CA310_410_Optical_Tool
         }
         private void canmeasure()
         {
-            ButtonCancel.Enabled = false;
+            //ButtonCancel.Enabled = false;
             ButtonMeasure.Enabled = true;
             ButtonCalZero.Enabled = true;
             button_gammapattern.Enabled = true;
@@ -415,16 +433,17 @@ namespace CA310_410_Optical_Tool
             button_410.Enabled = false;
             button_Gamma.Enabled = true;
             button_2238gamma.Enabled = true;
-            button_LuminanceTest.Enabled = true;
-            button_LuminanceTest2.Enabled = true;
-            button_ColorTemperature.Enabled = true;
-            button_ContrastRatio.Enabled = true;
-            button_Uniformity.Enabled = true;
+            checkBox_LumP1.Enabled = true;
+            checkBox_LumP2.Enabled = true;
+            checkBox_CTTest.Enabled = true;
+            checkBox_Contrast.Enabled = true;
+            checkBox_Unifornity.Enabled = true;
             //button_lightSensor.Enabled = true;
-            button_colorGamut.Enabled = true;
-            button_DimmingRange.Enabled = true;
+            checkBox_ColorGamut.Enabled = true;
+            checkBox_Dimming.Enabled = true;
             //button_DynamicContrasRatioTest.Enabled = true;
             button_AutoMeasure.Enabled = true;
+            button_StartTestCase.Enabled = true;
         }
         private void canTmeasure()
         {
@@ -438,16 +457,17 @@ namespace CA310_410_Optical_Tool
             button_410.Enabled = true;
             button_Gamma.Enabled = false;
             button_2238gamma.Enabled = false;
-            button_LuminanceTest.Enabled = false;
-            button_LuminanceTest2.Enabled = false;
-            button_ColorTemperature.Enabled = false;
-            button_ContrastRatio.Enabled = false;
-            button_Uniformity.Enabled = false;
+            checkBox_LumP1.Enabled = false;
+            checkBox_LumP2.Enabled = false;
+            checkBox_CTTest.Enabled = false;
+            checkBox_Contrast.Enabled = false;
+            checkBox_Unifornity.Enabled = false;
             //button_lightSensor.Enabled = false;
-            button_colorGamut.Enabled = false;
-            button_DimmingRange.Enabled = false;
+            checkBox_ColorGamut.Enabled = false;
+            checkBox_Dimming.Enabled = false;
             //button_DynamicContrasRatioTest.Enabled = false;
             button_AutoMeasure.Enabled = false;
+            button_StartTestCase.Enabled = false;
         }
         private void button_SaveCsv_Click(object sender, EventArgs e)
         {
@@ -668,7 +688,7 @@ namespace CA310_410_Optical_Tool
         }
         private void button_buttonOpenCloseCom_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)//COM若關閉
+            if (!serialPort2238.IsOpen)//COM若關閉
             {
                 try
                 {
@@ -687,20 +707,20 @@ namespace CA310_410_Optical_Tool
                     Int32 iBaudRate = Convert.ToInt32(strBaudRate);
                     Int32 iDataBit = Convert.ToInt32(strDataBit);
 
-                    serialPort.PortName = strSerialName;//COM
-                    serialPort.BaudRate = iBaudRate;//波特率
-                    serialPort.DataBits = iDataBit;//數據位
+                    serialPort2238.PortName = strSerialName;//COM
+                    serialPort2238.BaudRate = iBaudRate;//波特率
+                    serialPort2238.DataBits = iDataBit;//數據位
 
                     switch (strStopBit)            //停止位
                     {
                         case "1":
-                            serialPort.StopBits = StopBits.One;
+                            serialPort2238.StopBits = StopBits.One;
                             break;
                         case "1.5":
-                            serialPort.StopBits = StopBits.OnePointFive;
+                            serialPort2238.StopBits = StopBits.OnePointFive;
                             break;
                         case "2":
-                            serialPort.StopBits = StopBits.Two;
+                            serialPort2238.StopBits = StopBits.Two;
                             break;
                         default:
                             MessageBox.Show("Error：停止位參數錯誤!", "Error");
@@ -709,13 +729,13 @@ namespace CA310_410_Optical_Tool
                     switch (strCheckBit)             //校驗位
                     {
                         case "None":
-                            serialPort.Parity = Parity.None;
+                            serialPort2238.Parity = Parity.None;
                             break;
                         case "Odd":
-                            serialPort.Parity = Parity.Odd;
+                            serialPort2238.Parity = Parity.Odd;
                             break;
                         case "Even":
-                            serialPort.Parity = Parity.Even;
+                            serialPort2238.Parity = Parity.Even;
                             break;
                         default:
                             MessageBox.Show("Error：教驗位參數錯誤!", "Error");
@@ -728,7 +748,7 @@ namespace CA310_410_Optical_Tool
                     }
 
                     //打開串口
-                    serialPort.Open();
+                    serialPort2238.Open();
 
                     //打開串口後設置變無效
                     comboBox_com.Enabled = false;
@@ -752,7 +772,7 @@ namespace CA310_410_Optical_Tool
             else //COM處於打開
             {
 
-                serialPort.Close();//關閉串口
+                serialPort2238.Close();//關閉串口
                 //串口关闭时设置有效
                 comboBox_com.Enabled = true;
                 button_buttonOpenCloseCom.Text = "Open COM";
@@ -774,68 +794,68 @@ namespace CA310_410_Optical_Tool
         }
         private void button_whitepattern_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void button_blackpattern_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 111;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void button_redpattern_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 021;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void button_greenpattern_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 022;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void button_bluepattern_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 023;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void button_9point_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
             }
             String strSend = "run ptn 1087;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
         }
         private void gammacurve2238(object lv)
         {
             objCa.Measure();
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 return;
@@ -861,15 +881,15 @@ namespace CA310_410_Optical_Tool
                 if (checkBox1_Red.Checked == true)
                 {
                     String strSend = "run ptn 021;";//发送框数据
-                    serialPort.WriteLine(strSend);//发送一行数据
-                    serialPort.WriteLine("func luminance 0 1;");
+                    serialPort2238.WriteLine(strSend);//发送一行数据
+                    serialPort2238.WriteLine("func luminance 0 1;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
-                    serialPort.WriteLine("func luminance 1 0;");
+                    serialPort2238.WriteLine("func luminance 1 0;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                     dataGridView1.Rows.Clear();
                     for (int i = 255; i >= 0; i--)
                     {
-                        serialPort.WriteLine("func luminance 3 " + i + ";");
+                        serialPort2238.WriteLine("func luminance 3 " + i + ";");
                         Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                         label_colorstep.Text = "Color Step:" + i;
                         label_colorstep.ForeColor = Color.Green;
@@ -880,20 +900,20 @@ namespace CA310_410_Optical_Tool
                             goto measureend;
                         }
                     }
-                    gammaexcelNPOI(filePath, dataGridView1, 3);
+                    gammaexcelNPOI(filePath, dataGridView1, 0);
                 }
                 if (checkBox2_Green.Checked == true)
                 {
                     String strSend = "run ptn 022;";//发送框数据
-                    serialPort.WriteLine(strSend);//发送一行数据
-                    serialPort.WriteLine("func luminance 0 1;");
+                    serialPort2238.WriteLine(strSend);//发送一行数据
+                    serialPort2238.WriteLine("func luminance 0 1;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
-                    serialPort.WriteLine("func luminance 1 0;");
+                    serialPort2238.WriteLine("func luminance 1 0;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                     dataGridView1.Rows.Clear();
                     for (int i = 255; i >= 0; i--)
                     {
-                        serialPort.WriteLine("func luminance 3 " + i + ";");
+                        serialPort2238.WriteLine("func luminance 3 " + i + ";");
                         Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                         label_colorstep.Text = "Color Step:" + i;
                         label_colorstep.ForeColor = Color.Green;
@@ -904,20 +924,20 @@ namespace CA310_410_Optical_Tool
                             goto measureend;
                         }
                     }
-                    gammaexcelNPOI(filePath, dataGridView1, 3);
+                    gammaexcelNPOI(filePath, dataGridView1, 1);
                 }
                 if (checkBox3_Blue.Checked == true)
                 {
                     String strSend = "run ptn 023;";//发送框数据
-                    serialPort.WriteLine(strSend);//发送一行数据
-                    serialPort.WriteLine("func luminance 0 1;");
+                    serialPort2238.WriteLine(strSend);//发送一行数据
+                    serialPort2238.WriteLine("func luminance 0 1;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
-                    serialPort.WriteLine("func luminance 1 0;");
+                    serialPort2238.WriteLine("func luminance 1 0;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                     dataGridView1.Rows.Clear();
                     for (int i = 255; i >= 0; i--)
                     {
-                        serialPort.WriteLine("func luminance 3 " + i + ";");
+                        serialPort2238.WriteLine("func luminance 3 " + i + ";");
                         Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                         label_colorstep.Text = "Color Step:" + i;
                         label_colorstep.ForeColor = Color.Green;
@@ -928,20 +948,20 @@ namespace CA310_410_Optical_Tool
                             goto measureend;
                         }
                     }
-                    gammaexcelNPOI(filePath, dataGridView1, 3);
+                    gammaexcelNPOI(filePath, dataGridView1, 2);
                 }
                 if (checkBox4_White.Checked == true)
                 {
                     String strSend = "run ptn 020;";//发送框数据
-                    serialPort.WriteLine(strSend);//发送一行数据
-                    serialPort.WriteLine("func luminance 0 1;");
+                    serialPort2238.WriteLine(strSend);//发送一行数据
+                    serialPort2238.WriteLine("func luminance 0 1;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
-                    serialPort.WriteLine("func luminance 1 0;");
+                    serialPort2238.WriteLine("func luminance 1 0;");
                     Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                     dataGridView1.Rows.Clear();
                     for (int i = 255; i >= 0; i--)
                     {
-                        serialPort.WriteLine("func luminance 3 " + i + ";");
+                        serialPort2238.WriteLine("func luminance 3 " + i + ";");
                         Thread.Sleep(Int32.Parse(textBox_gammadelay.Text));
                         label_colorstep.Text = "Color Step:" + i;
                         label_colorstep.ForeColor = Color.Green;
@@ -985,36 +1005,43 @@ namespace CA310_410_Optical_Tool
                 button_Gamma.Text = "Pattern Start";
             }
         }
-        private void button_LuminanceTest_Click(object sender, EventArgs e)
+        private void LumP1()
         {
-            //1.1亮度填入表格
+            //1.1亮度填入表格-1
             canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else    
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             int sheet = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            NPOIExcel RS232file = new NPOIExcel();
+            RS232file.open(RS232filepath, 1);
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
             Thread.Sleep(1000);
-            for (int k=0;k< comboBox_sourcelist.Items.Count; k++)
+            for (int k = 0; k < comboBox_sourcelist.Items.Count; k++)
             {
                 comboBox_sourcelist.SelectedIndex = k;
-                writer.SetCell(4, 3+k, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ", White Pattern.");
+                writer.SetCell(4, 3 + k, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                if (serialPortPID.IsOpen)
+                {
+                    string Source = comboBox_sourcelist.Text;
+                    string Sourcecommand = GetToolConfigCell(RS232file.workbook, "Source", Source, "Command");
+                    byte[] Sourcecommandbyte = StringToByteArray(Sourcecommand);
+                    serialPortPID.Write(Sourcecommandbyte, 0, Sourcecommandbyte.Length);
+                    Thread.Sleep(8000);
+                }
+                else
+                {
+                    MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ", White Pattern.");
+                }
                 measure(1);
             }
             for (int j = 0; j < dataGridView1.Rows.Count - 1; j++)
@@ -1023,23 +1050,16 @@ namespace CA310_410_Optical_Tool
                 writer.SetCell(j + 3, 4, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始
                 writer.SetCell(j + 3, 6, dataGridView1.Rows[j].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
             }
-            MessageBox.Show("Test Finish.","Finish");
         finish:
             writer.SaveClose(filePath);
             canmeasure();
         }
-        private void button_LuminanceTest2_Click(object sender, EventArgs e)
+        private void LumP2()
         {
-            //1.1亮度填入表格
+            //1.1亮度填入表格-2
             canTmeasure();
             dataGridView1.Rows.Clear();
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 0;
@@ -1048,23 +1068,44 @@ namespace CA310_410_Optical_Tool
             int gridviewrow = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            NPOIExcel RS232file = new NPOIExcel();
+            RS232file.open(RS232filepath, 1);
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
             Thread.Sleep(1000);
             for (int k = 0; k < comboBox_sourcelist.Items.Count; k++)
             {
+                comboBox_sourcelist.SelectedIndex = k;
+                if (serialPortPID.IsOpen)
+                {
+                    string Source = comboBox_sourcelist.Text;
+                    string Sourcecommand = GetToolConfigCell(RS232file.workbook, "Source", Source, "Command");
+                    byte[] Sourcecommandbyte = StringToByteArray(Sourcecommand);
+                    serialPortPID.Write(Sourcecommandbyte, 0, Sourcecommandbyte.Length);
+                    Thread.Sleep(8000);
+                }
                 for (int m = 0; m < comboBox_modelist.Items.Count; m++)
                 {
-                    comboBox_sourcelist.SelectedIndex = k;
                     comboBox_modelist.SelectedIndex = m;
-                    writer.SetCell(17 , 3 + 2 * m, comboBox_modelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    writer.SetCell(19 + k, 1 , comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ","+ comboBox_modelist.SelectedItem.ToString() + ", White Pattern.");
+                    writer.SetCell(17, 3 + 2 * m, comboBox_modelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                    writer.SetCell(19 + k, 1, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                    if (serialPortPID.IsOpen)
+                    {
+                        string Mode = comboBox_modelist.Text;
+                        string Modecommand = GetToolConfigCell(RS232file.workbook, "PictureMode", Mode, "Command");
+                        byte[] Modecommandbyte = StringToByteArray(Modecommand);
+                        serialPortPID.Write(Modecommandbyte, 0, Modecommandbyte.Length);
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + "," + comboBox_modelist.SelectedItem.ToString() + ", White Pattern.");
+                    }
                     measure(1);
                 }
             }
@@ -1072,56 +1113,70 @@ namespace CA310_410_Optical_Tool
             {
                 for (int j = 0; j < comboBox_modelist.Items.Count; j++)
                 {
-                    writer.SetCell(i + excelrow-1, excelcolumn, dataGridView1.Rows[gridviewrow].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
+                    writer.SetCell(i + excelrow - 1, excelcolumn, dataGridView1.Rows[gridviewrow].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
                     gridviewrow++;
                     excelcolumn = excelcolumn + 2;
                 }
                 excelcolumn = 3;
             }
-            MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
             canmeasure();
         }
-        private void button_ColorTemperature_Click(object sender, EventArgs e)
+        private void CT()
         {
             //1.2 色溫XY填入表格
             canTmeasure();
             dataGridView1.Rows.Clear();
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
-            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 1;
             int excelcolumnX = 5;//excel直欄
-            int excelrowX = 23;//excel橫列
-            int excelrowY = 25;//excel橫列
+            int excelrowX = 24;//excel橫列
+            int excelrowY = 26;//excel橫列
+            int excelrowT = 23;
             int gridviewrow = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
+            NPOIExcel RS232file = new NPOIExcel();
+            RS232file.open(RS232filepath, 1);
             Thread.Sleep(1000);
             for (int k = 0; k < comboBox_sourcelist.Items.Count; k++)
             {
+                comboBox_sourcelist.SelectedIndex = k;
+                if (serialPortPID.IsOpen)
+                {
+                    string Source = comboBox_sourcelist.Text;
+                    string Sourcecommand = GetToolConfigCell(RS232file.workbook, "Source", Source, "Command");
+                    byte[] Sourcecommandbyte = StringToByteArray(Sourcecommand);
+                    serialPortPID.Write(Sourcecommandbyte, 0, Sourcecommandbyte.Length);
+                    Thread.Sleep(8000);
+                }
                 for (int m = 0; m < comboBox_CTlist.Items.Count; m++)
                 {
-                    comboBox_sourcelist.SelectedIndex = k;
                     comboBox_CTlist.SelectedIndex = m;
-                    writer.SetCell(2+m*2, 1, comboBox_CTlist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    writer.SetCell(21, 5+m, comboBox_CTlist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    writer.SetCell(22+k*4, 3, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + "," + comboBox_CTlist.SelectedItem.ToString() + ", White Pattern.");
+                    writer.SetCell(2 + m * 2, 1, comboBox_CTlist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                    writer.SetCell(21, 5 + m, comboBox_CTlist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                    writer.SetCell(22 + k * 4, 3, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                    if (serialPortPID.IsOpen)
+                    {
+                        string CT = comboBox_CTlist.Text;
+                        string CTcommand = GetToolConfigCell(RS232file.workbook, "ColorTemperature", CT, "Command");
+                        byte[] CTcommandbyte = StringToByteArray(CTcommand);
+                        serialPortPID.Write(CTcommandbyte, 0, CTcommandbyte.Length);
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + "," + comboBox_CTlist.SelectedItem.ToString() + ", White Pattern.");
+                    }
                     measure(1);
                 }
             }
@@ -1131,19 +1186,20 @@ namespace CA310_410_Optical_Tool
                 {
                     writer.SetCell(i + excelrowX - 1, excelcolumnX, dataGridView1.Rows[gridviewrow].Cells[1].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始
                     writer.SetCell(i + excelrowY - 1, excelcolumnX, dataGridView1.Rows[gridviewrow].Cells[2].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
+                    writer.SetCell(i + excelrowT - 1, excelcolumnX, dataGridView1.Rows[gridviewrow].Cells[4].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始  
                     gridviewrow++;
                     excelcolumnX = excelcolumnX + 1;
                 }
-                excelrowX = excelrowX + 3;
-                excelrowY = excelrowY + 3;
+                excelrowX = excelrowX + 4;
+                excelrowY = excelrowY + 4;
+                excelrowT = excelrowT + 4;
                 excelcolumnX = 5;
             }
-            MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
             canmeasure();
         }
-        private void button_ContrastRatio_Click(object sender, EventArgs e)
+        private void ContrastRatio()
         {
             canTmeasure();
             contrastratio(020, 4, ", White Pattern.");//白
@@ -1156,38 +1212,51 @@ namespace CA310_410_Optical_Tool
             //ptn為patterngen pattern號, x為打印直排行數,pattern為msg文字
             //1.3
             dataGridView1.Rows.Clear();
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
-            //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 2;
             int excelCTY = 0;
             int gridviewrow = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-
-            if (!serialPort.IsOpen)
+            NPOIExcel RS232file = new NPOIExcel();
+            RS232file.open(RS232filepath, 1);
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
-            String strSend = "run ptn "+ptn+";";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            String strSend = "run ptn " + ptn + ";";//发送框数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
             Thread.Sleep(1000);
             for (int k = 0; k < comboBox_sourcelist.Items.Count; k++)
             {
+                comboBox_sourcelist.SelectedIndex = k;
+                if (serialPortPID.IsOpen)
+                {
+                    string Source = comboBox_sourcelist.Text;
+                    string Sourcecommand = GetToolConfigCell(RS232file.workbook, "Source", Source, "Command");
+                    byte[] Sourcecommandbyte = StringToByteArray(Sourcecommand);
+                    serialPortPID.Write(Sourcecommandbyte, 0, Sourcecommandbyte.Length);
+                    Thread.Sleep(8000);
+                }
                 for (int m = 0; m < comboBox_CTlist.Items.Count; m++)
                 {
-                    comboBox_sourcelist.SelectedIndex = k;
                     comboBox_CTlist.SelectedIndex = m;
                     writer.SetCell(4 + m + excelCTY, 1, comboBox_CTlist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
                     writer.SetCell(1 + k * 12, 1, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
-                    MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + "," + comboBox_CTlist.SelectedItem.ToString() + pattern);
+                    if (serialPortPID.IsOpen)
+                    {
+                        string CT = comboBox_CTlist.Text;
+                        string CTcommand = GetToolConfigCell(RS232file.workbook, "ColorTemperature", CT, "Command");
+                        byte[] CTcommandbyte = StringToByteArray(CTcommand);
+                        serialPortPID.Write(CTcommandbyte, 0, CTcommandbyte.Length);
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + "," + comboBox_CTlist.SelectedItem.ToString() + pattern);
+                    }
                     measure(1);
                 }
                 excelCTY = excelCTY + 12;
@@ -1196,45 +1265,39 @@ namespace CA310_410_Optical_Tool
             {
                 for (int j = 0; j < comboBox_CTlist.Items.Count; j++)
                 {
-                    writer.SetCell(4+j+i*12, x, dataGridView1.Rows[gridviewrow].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始
+                    writer.SetCell(4 + j + i * 12, x, dataGridView1.Rows[gridviewrow].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始
                     gridviewrow++;
                 }
             }
         finish:
             writer.SaveClose(filePath);
         }
-        private void button_Uniformity_Click(object sender, EventArgs e)
+        private void Uniformity()
         {
-            //1.4
+            //1.4 9POINT
             canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 3;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
             Thread.Sleep(1500);
             for (int k = 0; k < 9; k++)
             {
-                MessageBox.Show("Put CA310/410 to point " + (k+1) + ", White Pattern.");
+                MessageBox.Show("Put CA310/410 to point " + (k + 1) + ", White Pattern.");
                 measure(1);
             }
-            for (int j = 0; j < dataGridView1.Rows.Count -1; j++)
+            for (int j = 0; j < dataGridView1.Rows.Count - 1; j++)
             {
                 writer.SetCell(8 + j, 3, dataGridView1.Rows[j].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
             }
@@ -1242,41 +1305,30 @@ namespace CA310_410_Optical_Tool
             writer.SaveClose(filePath);
             canmeasure();
         }
-        private void button_lightSensor_Click(object sender, EventArgs e)
+        private void colorGamut()
         {
-            //1.7
-
-        }
-        private void button_colorGamut_Click(object sender, EventArgs e)
-        {
+            //1.8 color gamut-9POINT
             canTmeasure();
             for (int k = 0; k < comboBox_CTlist.Items.Count; k++)
             {
                 comboBox_CTlist.SelectedIndex = k;
-                MessageBox.Show("Change color temperature to "+ comboBox_CTlist.SelectedItem.ToString());
-                colorgamut(k*30);
+                MessageBox.Show("Change color temperature to " + comboBox_CTlist.SelectedItem.ToString());
+                colorgamut(k * 30);
             }
-            MessageBox.Show("Test Finish.", "Finish");
             canmeasure();
         }
         private void colorgamut(int CT)
         {
-            //1.8 color gamut
+            //1.8 color gamut-9POINT
             dataGridView1.Rows.Clear();
             number = 0;
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 5;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
@@ -1286,22 +1338,22 @@ namespace CA310_410_Optical_Tool
             {
                 MessageBox.Show("Put CA310/410 to point " + (i + 1));
                 String strSend = "run ptn 021;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 Thread.Sleep(500);
                 //MessageBox.Show("Put CA310/410 to point " + (i + 1) + ", Red Pattern.");
                 measure(1);
                 strSend = "run ptn 022;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 Thread.Sleep(500);
                 //MessageBox.Show("Put CA310/410 to point " + (i + 1) + ", Green Pattern.");
                 measure(1);
                 strSend = "run ptn 023;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 Thread.Sleep(500);
                 //MessageBox.Show("Put CA310/410 to point " + (i + 1) + ", Blue Pattern.");
                 measure(1);
                 strSend = "run ptn 020;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 Thread.Sleep(500);
                 //MessageBox.Show("Put CA310/410 to point " + (i + 1) + ", White Pattern.");
                 measure(1);
@@ -1322,44 +1374,59 @@ namespace CA310_410_Optical_Tool
         finish:
             writer.SaveClose(filePath);
         }
-        private void button_DimmingRange_Click(object sender, EventArgs e)
+        private void DimmingRange()
         {
             //1.10
             canTmeasure();
             dataGridView1.Rows.Clear();
             number = 0;
-            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
-            {
-            }
-            else
-            {
-                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
-            }
+            checkOriginalfile();
             string filePath = System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls";
             //string filePath = System.Environment.CurrentDirectory + "\\Test_Report_optical.xls";
             int sheet = 6;
             int percent = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            NPOIExcel RS232file = new NPOIExcel();
+            RS232file.open(RS232filepath, 1);
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
             }
             String strSend = "run ptn 020;";//发送框数据
-            serialPort.WriteLine(strSend);//发送一行数据
+            serialPort2238.WriteLine(strSend);//发送一行数据
             Thread.Sleep(1000);
             for (int k = 0; k < comboBox_sourcelist.Items.Count; k++)
             {
                 comboBox_sourcelist.SelectedIndex = k;
                 writer.SetCell(2, 3 + k, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
+                if (serialPortPID.IsOpen)
+                {
+                    string Source = comboBox_sourcelist.Text;
+                    string Sourcecommand = GetToolConfigCell(RS232file.workbook, "Source", Source, "Command");
+                    byte[] Sourcecommandbyte = StringToByteArray(Sourcecommand);
+                    serialPortPID.Write(Sourcecommandbyte, 0, Sourcecommandbyte.Length);
+                    Thread.Sleep(8000);
+                }
                 for (int i = 0; i < 11; i++)
                 {
                     if (i == 0)
                         percent = 0;
                     else
                         percent = i * 10;
-                    MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ", White Pattern, OSD Level " + percent+"%");
+                    if (serialPortPID.IsOpen)
+                    {
+                        string OSDLevel = percent.ToString();
+                        string OSDLevelcommand = GetToolConfigCell(RS232file.workbook, "OSDLevel", OSDLevel, "Command");
+                        byte[] OSDLevelcommandbyte = StringToByteArray(OSDLevelcommand);
+                        serialPortPID.Write(OSDLevelcommandbyte, 0, OSDLevelcommandbyte.Length);
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ", White Pattern, OSD Level " + percent + "%");
+                    }
                     measure(1);
                 }
             }
@@ -1369,18 +1436,17 @@ namespace CA310_410_Optical_Tool
             {
                 if (j % 11 == 0 && j > 0)
                 {
-                    excelx ++;
-                    count=0;
+                    excelx++;
+                    count = 0;
                 }
                 writer.SetCell(3 + count, excelx, dataGridView1.Rows[j].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始      
-                count ++;
+                count++;
             }
-            MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
             canmeasure();
         }
-        private void button_DynamicContrasRatioTest_Click(object sender, EventArgs e)
+        private void DynamicContrasRatio()
         {
             //1.11
             canTmeasure();
@@ -1399,7 +1465,7 @@ namespace CA310_410_Optical_Tool
             int excelY = 0;
             NPOIExcel writer = new NPOIExcel();
             writer.open(filePath, sheet);
-            if (!serialPort.IsOpen)
+            if (!serialPort2238.IsOpen)
             {
                 MessageBox.Show("請打開串口", "Error");
                 goto finish;
@@ -1409,28 +1475,45 @@ namespace CA310_410_Optical_Tool
                 comboBox_sourcelist.SelectedIndex = k;
                 writer.SetCell(2 + k * 3, 4, comboBox_sourcelist.SelectedItem.ToString(), NPOI.SS.UserModel.CellType.String);//rowcount,column count 都由0開始
                 String strSend = "run ptn 020;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 MessageBox.Show(comboBox_sourcelist.SelectedItem.ToString() + ", White Pattern.");
                 measure(1);
                 strSend = "run ptn 111;";//发送框数据
-                serialPort.WriteLine(strSend);//发送一行数据
+                serialPort2238.WriteLine(strSend);//发送一行数据
                 StartKiller();
-                MessageBox.Show("Automatically close this window after 10 seconds and measure the black screen.", "Wait 10 second.", MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                MessageBox.Show("Automatically close this window after 10 seconds and measure the black screen.", "Wait 10 second.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 measure(1);
             }
-            
+
             for (int j = 0; j < dataGridView1.Rows.Count - 1; j++)
             {
-                if(j%2==0 && j>0)
+                if (j % 2 == 0 && j > 0)
                 {
-                    excelY ++;
+                    excelY++;
                 }
                 writer.SetCell(2 + j + excelY, 6, dataGridView1.Rows[j].Cells[3].Value.ToString(), NPOI.SS.UserModel.CellType.Numeric);//rowcount,column count 都由0開始 
             }
-            MessageBox.Show("Test Finish.", "Finish");
         finish:
             writer.SaveClose(filePath);
             canmeasure();
+        }
+        private void button_StartTestCase_Click(object sender, EventArgs e)
+        {
+            if (checkBox_LumP1.Checked)
+                LumP1();
+            if (checkBox_LumP2.Checked)
+                LumP2();
+            if (checkBox_CTTest.Checked)
+                CT();
+            if (checkBox_Contrast.Checked)
+                ContrastRatio();
+            if (checkBox_Unifornity.Checked)
+                Uniformity();
+            if (checkBox_ColorGamut.Checked)
+                colorGamut();
+            if (checkBox_Dimming.Checked)
+                DimmingRange();
+            MessageBox.Show("Test Finish.", "Finish");
         }
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -1479,6 +1562,18 @@ namespace CA310_410_Optical_Tool
         {
             comboboxremove(comboBox_CTlist, inifilename_CT);
         }
+        private void button_Select232File_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Multiselect = true;//該值確定是否可以選擇多個檔案
+            dialog.Title = "請選擇資料夾";
+            dialog.Filter = "所有檔案(*.*)|*.*";
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                RS232filepath = dialog.FileName;
+                label15.Text = "Command File:\r\n" + Path.GetFileName(dialog.FileName);
+            }
+        }
         private void comboboxadd(ComboBox combobox, string file)
         {
             //新增或者選擇combobox選項後,更新combobox選項順序
@@ -1510,8 +1605,215 @@ namespace CA310_410_Optical_Tool
             }
             sw.Close();
         }
+        private void button_searchPIDcom_Click(object sender, EventArgs e)
+        {
+            comboBox_PID.Text = "";
+            comboBox_PID.Items.Clear();
 
+            string[] str = SerialPort.GetPortNames();
+            if (str == null)
+            {
+                MessageBox.Show("未偵測到COM Port！", "Error");
+                return;
+            }
 
+            //添加COM
+            foreach (string s in str)
+            {
+                comboBox_PID.Items.Add(s);
+            }
+
+            //設置預設COM
+            comboBox_PID.SelectedIndex = 0;
+        }
+        private void button_conncetPIDcom_Click(object sender, EventArgs e)
+        {
+            if (!serialPortPID.IsOpen)//COM若關閉
+            {
+                try
+                {
+
+                    if (comboBox_PID.SelectedIndex == -1)
+                    {
+                        MessageBox.Show("Error: 無效端口,請重新選擇", "Error");
+                        return;
+                    }
+                    string strSerialName = comboBox_PID.SelectedItem.ToString();
+                    string strBaudRate = comboBox_PIDBR.SelectedItem.ToString();
+                    string strDataBit = comboBox_PIDDataBit.SelectedItem.ToString();
+                    string strCheckBit = comboBox_PIDParity.SelectedItem.ToString();
+                    string strStopBit = comboBox_StopBit.SelectedItem.ToString();
+
+                    Int32 iBaudRate = Convert.ToInt32(strBaudRate);
+                    Int32 iDataBit = Convert.ToInt32(strDataBit);
+
+                    serialPortPID.PortName = strSerialName;//COM
+                    serialPortPID.BaudRate = iBaudRate;//波特率
+                    serialPortPID.DataBits = iDataBit;//數據位
+
+                    switch (strStopBit)            //停止位
+                    {
+                        case "1":
+                            serialPortPID.StopBits = StopBits.One;
+                            break;
+                        case "1.5":
+                            serialPortPID.StopBits = StopBits.OnePointFive;
+                            break;
+                        case "2":
+                            serialPortPID.StopBits = StopBits.Two;
+                            break;
+                        default:
+                            MessageBox.Show("Error：停止位參數錯誤!", "Error");
+                            break;
+                    }
+                    switch (strCheckBit)             //校驗位
+                    {
+                        case "None":
+                            serialPortPID.Parity = Parity.None;
+                            break;
+                        case "Odd":
+                            serialPortPID.Parity = Parity.Odd;
+                            break;
+                        case "Even":
+                            serialPortPID.Parity = Parity.Even;
+                            break;
+                        default:
+                            MessageBox.Show("Error：教驗位參數錯誤!", "Error");
+                            break;
+                    }
+
+                    if (saveDataFile != null)
+                    {
+                        saveDataFS = File.Create(saveDataFile);
+                    }
+
+                    //打開串口
+                    serialPortPID.Open();
+
+                    //打開串口後設置變無效
+                    comboBox_PID.Enabled = false;
+                    button_conncetPIDcom.Text = "Close COM";
+                    label_PIDconnect.Text = "Connect Pass";
+                    label_PIDconnect.ForeColor = Color.Green;
+                    comboBox_PIDBR.Enabled = false;
+                    comboBox_PIDDataBit.Enabled = false;
+                    comboBox_StopBit.Enabled = false;
+                    comboBox_PIDParity.Enabled = false;
+
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show("Error:" + ex.Message, "Error");
+                    return;
+                }
+            }
+            else //COM處於打開
+            {
+
+                serialPortPID.Close();//關閉串口
+                //串口关闭时设置有效
+                comboBox_PID.Enabled = true;
+                button_conncetPIDcom.Text = "Open COM";
+                label_PIDconnect.Text = "No Connect";
+                label_PIDconnect.ForeColor = Color.Red;
+                comboBox_PIDBR.Enabled = true;
+                comboBox_PIDDataBit.Enabled = true;
+                comboBox_StopBit.Enabled = true;
+                comboBox_PIDParity.Enabled = true;
+                if (saveDataFS != null)
+                {
+                    saveDataFS.Close(); // 關閉完建
+                    saveDataFS = null;//釋放文件句柄
+                }
+
+            }
+        }
+        private void checkOriginalfile()
+        {
+            if (System.IO.File.Exists(textBox_excelname.Text + @".xls"))//檔案是否存在
+            {
+            }
+            else
+            {
+                File.Copy(System.Environment.CurrentDirectory + "\\Test_Report_optical_Original_file", System.Environment.CurrentDirectory + @"\" + textBox_excelname.Text + @".xls");
+            }
+        }
+        public string GetToolConfigCell(IWorkbook wookbook, string sheetName, string rowName, string columnName)
+        {
+
+            ISheet sheet = wookbook.GetSheet(sheetName);
+
+            if (sheet == null)
+                return null;
+            int rowIndex = -1;
+            int colIndex = -1;
+
+            for (int r = 0; r < sheet.PhysicalNumberOfRows; r++)
+            {
+                IRow row = sheet.GetRow(r);
+                if (row == null || row.Cells.Count == 0)
+                    continue;
+                if (row.Cells[0].CellType == CellType.String && string.Compare(row.Cells[0].StringCellValue, rowName, true) == 0)
+                {
+                    rowIndex = r;
+                    break;
+                }
+            }
+            IRow firstRow = sheet.GetRow(0);
+            for (int c = 0; c < firstRow.Cells.Count; c++)
+            {
+                if (firstRow.Cells[c].CellType == CellType.String && string.Compare(firstRow.Cells[c].StringCellValue, columnName, true) == 0)
+                {
+                    colIndex = c;
+                    break;
+                }
+            }
+
+            if (rowIndex != -1 && colIndex != -1)
+            {
+                string cellData = "";
+                ICell cell = sheet.GetRow(rowIndex).Cells[colIndex];
+
+                switch (cell.CellType)
+                {
+                    case CellType.Blank:
+                        cellData = "";
+                        break;
+                    case CellType.Boolean:
+                        cellData = Convert.ToString(cell.BooleanCellValue);
+                        break;
+                    case CellType.Error:
+                        cellData = Convert.ToString(cell.ErrorCellValue);
+                        break;
+                    case CellType.Formula:
+                        cellData = Convert.ToString(cell.StringCellValue);
+                        break;
+                    case CellType.Numeric:
+                        cellData = Convert.ToString(cell.NumericCellValue);
+                        break;
+                    case CellType.String:
+                        cellData = Convert.ToString(cell.StringCellValue);
+                        break;
+                    case CellType.Unknown:
+                        cellData = "";
+                        break;
+                }
+                return cellData;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public static byte[] StringToByteArray(String hex)
+        {
+            hex= hex.Replace(" ", "");
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
         public class NPOIExcel
         {
             public ISheet sheet;
@@ -1639,6 +1941,7 @@ namespace CA310_410_Optical_Tool
                     fileStream.Close();
                 }
             }
+           
         }
         public class SetupIniIP
         {
@@ -1664,5 +1967,4 @@ namespace CA310_410_Optical_Tool
 
 
     }
-
 }
